@@ -1,0 +1,16 @@
+# Short sentences for practice. One per line; lines starting with # are ignored.
+The quick brown fox jumps over the lazy dog near the riverbank.
+Measure twice, cut once, and keep the receipt just in case.
+A test that talks to production is an incident, not a test.
+The drone finished the survey before the afternoon wind picked up.
+Please commit early, push often, and never force on a shared branch.
+Her keyboard clicked softly while the rain tapped on the window.
+Small functions with clear names age better than clever ones.
+We watched the sunrise from the roof with cold coffee and warm bread.
+The backup finished at midnight and the log turned green at last.
+If it is not written down, it did not happen in a month from now.
+The printer stalled at ninety percent and then quietly resumed.
+Good tools disappear; you only notice the ones that get in the way.
+Six geese flew low over the frozen lake just before dusk.
+Type the sentence exactly as shown, including every comma and period.
+Nobody remembers the fast feature; everybody remembers the lost data.
