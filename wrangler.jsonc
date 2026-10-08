@@ -8,6 +8,7 @@
   // URL de respaldo mientras el dominio propio no resuelve: https://teclea.teclea.workers.dev
   "workers_dev": true,
   "assets": { "directory": "sitio", "not_found_handling": "404-page" },
-  // teclea.yanes.me: wrangler crea el registro DNS y el certificado al desplegar.
-  "routes": [{ "pattern": "teclea.yanes.me", "custom_domain": true }]
+  // teclea.yanes.me: ruta de zona. Necesita un registro DNS proxied para ese nombre (AAAA 100::),
+  // porque la creacion automatica de DNS de los "custom domains" no funciono en esta zona (2026-10-08).
+  "routes": [{ "pattern": "teclea.yanes.me/*", "zone_name": "yanes.me" }]
 }

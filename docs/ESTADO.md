@@ -18,17 +18,18 @@ para que la usen Juan (Colemak) y Max (9 anos, empieza; QWERTY/latam) desde cual
 - Vista: `app.js` (perfiles, practica, progreso), `teclado-vista.js`, `grafica.js` (SVG, una serie, tooltip).
 - Entrada: textarea oculta; caracteres por `input` (sirve con teclas muertas), retroceso/Escape/Enter por `keydown`;
   pegar se ignora.
-- Publicacion: Worker con estaticos `teclea` en la cuenta Citadelta (`make publicar` = `npx wrangler deploy`,
-  config en `wrangler.jsonc`). Viva en https://teclea.teclea.workers.dev desde el 2026-10-08.
+- Publicacion: Worker con estaticos `teclea` en la cuenta de Cloudflare de juan@yanes.me (la que tiene la zona
+  `yanes.me`). `make publicar` = `wrangler deploy` con la sesion OAuth guardada en `~/.config/wrangler-yanes`
+  (XDG_CONFIG_HOME aparte, para no pisar la sesion de Citadelta); `make login` la crea en otra maquina.
+  Viva en https://teclea.yanes.me desde el 2026-10-08 (y https://teclea.taleny-clubes.workers.dev).
 
-## Bloqueado: teclea.yanes.me (2026-10-08)
+## Como esta enganchado el dominio (2026-10-08)
 
-La zona viva de `yanes.me` esta en OTRA cuenta de Cloudflare de Juan (movida el 2026-10-04), que el login de
-wrangler de mjolnir no ve (solo ve Citadelta y la cuenta de yanes.juan@gmail.com). El Worker `teclea` se
-desplego en Citadelta y por eso su dominio propio no obtiene registro DNS: la zona de Citadelta es el cascaron
-en estado "moved". Para resolverlo: token de API de la cuenta buena en `.env` (ver `.env.example`) y
-`make publicar`; despues borrar el Worker de Citadelta (`CLOUDFLARE_ACCOUNT_ID=d20bb391... npx wrangler delete`).
-Mientras, la app vive en https://teclea.teclea.workers.dev.
+Ruta de zona `teclea.yanes.me/*` (en `wrangler.jsonc`) mas un registro DNS creado a mano en el panel:
+`teclea` A `192.0.2.1` proxied (IP de relleno; la ruta manda al Worker antes de llegar a ningun origen).
+No se uso "custom domain" porque en esta zona Cloudflare no creaba el registro DNS automatico (probado tres
+veces, tambien con un hostname de control): el dominio quedaba enganchado con certificado pero sin DNS.
+Si algun dia se borra ese registro A, la ruta deja de responder: recrearlo igual.
 
 ## Pendiente / ideas
 
