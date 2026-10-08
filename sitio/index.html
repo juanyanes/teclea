@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>teclea</title>
+<meta name="description" content="Entrenador de mecanografía para toda la familia: niveles progresivos, teclado en pantalla, logros y progreso.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<header class="cabecera">
+  <a class="logo" href="#" data-ir="perfiles">⌨️ teclea</a>
+  <nav class="nav" id="nav" hidden>
+    <span class="chip" id="chip-perfil"></span>
+    <button class="boton boton-suave" data-ir="practica">Practicar</button>
+    <button class="boton boton-suave" data-ir="stats">Progreso</button>
+    <button class="boton boton-suave" data-ir="perfiles">Cambiar perfil</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===== Perfiles ===== -->
+<section id="vista-perfiles" class="vista">
+  <h1>¿Quién va a teclear?</h1>
+  <div class="tarjetas" id="lista-perfiles"></div>
+  <details class="tarjeta formulario" id="nuevo-perfil">
+    <summary>➕ Nuevo perfil</summary>
+    <form id="form-perfil" autocomplete="off">
+      <label>Nombre <input name="nombre" required maxlength="24" placeholder="Tu nombre"></label>
+      <label>Teclado
+        <select name="distribucion">
+          <option value="latam">Latinoamericano (con ñ)</option>
+          <option value="qwerty">QWERTY (inglés)</option>
+          <option value="colemak">Colemak</option>
+        </select>
+      </label>
+      <label>Frases
+        <select name="corpus" id="form-corpus"></select>
+      </label>
+      <label>Palabras por línea
+        <select name="palabras">
+          <option value="6">6 (muy cortas)</option>
+          <option value="8" selected>8 (cortas)</option>
+          <option value="12">12</option>
+          <option value="20">20 (largas)</option>
+        </select>
+      </label>
+      <label class="fila"><input type="checkbox" name="letraGrande" checked> Letra grande</label>
+      <label class="fila"><input type="checkbox" name="mostrarTeclado" checked> Mostrar el teclado en pantalla</label>
+      <button class="boton" type="submit">Crear</button>
+    </form>
+  </details>
+  <p class="nota">Todo se guarda en este navegador. Desde <em>Progreso</em> puedes exportar un respaldo y cargarlo en otra máquina.</p>
+</section>
+
+<!-- ===== Práctica ===== -->
+<section id="vista-practica" class="vista" hidden>
+  <div class="controles">
+    <label>Nivel <select id="sel-nivel"></select></label>
+    <label>Frases <select id="sel-corpus"></select></label>
+    <button class="boton boton-suave" id="btn-nueva">Otra línea</button>
+  </div>
+
+  <div class="vivo">
+    <div class="medidor"><span class="valor" id="vivo-ppm">0</span><span class="etiqueta">PPM</span></div>
+    <div class="medidor"><span class="valor" id="vivo-precision">100%</span><span class="etiqueta">precisión</span></div>
+    <div class="progreso" aria-hidden="true"><div class="progreso-barra" id="progreso-barra"></div><span class="cohete" id="cohete">🚀</span></div>
+  </div>
+
+  <div class="texto-marco" id="texto-marco">
+    <p class="texto" id="texto" aria-live="off"></p>
+    <div class="aviso-foco" id="aviso-foco">Haz clic aquí y empieza a escribir</div>
+    <textarea id="entrada" class="entrada" aria-label="Escribe aquí" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+  </div>
+  <p class="pista">Retroceso corrige · Escape cambia la línea · Enter, al terminar, da otra</p>
+
+  <div class="resultado tarjeta" id="resultado" hidden>
+    <h2 id="res-titulo">¡Línea completa!</h2>
+    <div class="cifras">
+      <div class="cifra"><span class="valor" id="res-ppm"></span><span class="etiqueta">PPM</span></div>
+      <div class="cifra"><span class="valor" id="res-precision"></span><span class="etiqueta">precisión</span></div>
+      <div class="cifra"><span class="valor" id="res-tiempo"></span><span class="etiqueta">segundos</span></div>
+      <div class="cifra"><span class="valor" id="res-errores"></span><span class="etiqueta">errores</span></div>
+    </div>
+    <p id="res-debiles" class="nota"></p>
+    <div id="res-logros" class="logros-nuevos"></div>
+    <div id="res-ascenso" class="ascenso" hidden>
+      <p>Tres líneas seguidas con buena precisión y velocidad. ¿Subimos de nivel?</p>
+      <button class="boton" id="btn-subir">Subir al nivel <span id="res-siguiente"></span></button>
+    </div>
+    <button class="boton" id="btn-otra">Otra línea ⏎</button>
+  </div>
+
+  <div class="teclado" id="teclado"></div>
+
+</section>
+
+<!-- ===== Progreso ===== -->
+<section id="vista-stats" class="vista" hidden>
+  <h1 id="stats-titulo">Progreso</h1>
+  <div class="cifras tarjeta">
+    <div class="cifra"><span class="valor" id="tot-sesiones"></span><span class="etiqueta">líneas</span></div>
+    <div class="cifra"><span class="valor" id="tot-palabras"></span><span class="etiqueta">palabras</span></div>
+    <div class="cifra"><span class="valor" id="tot-mejor"></span><span class="etiqueta">mejor PPM</span></div>
+    <div class="cifra"><span class="valor" id="tot-reciente"></span><span class="etiqueta">PPM últimas 10</span></div>
+  </div>
+  <div class="graficas">
+    <figure class="tarjeta grafica"><figcaption>Palabras por minuto, por línea</figcaption><div id="graf-ppm"></div></figure>
+    <figure class="tarjeta grafica"><figcaption>Precisión, por línea</figcaption><div id="graf-precision"></div></figure>
+  </div>
+  <div class="dos-columnas">
+    <div class="tarjeta">
+      <h2>Teclas que más fallan</h2>
+      <ul id="lista-debiles" class="debiles"></ul>
+    </div>
+    <div class="tarjeta">
+      <h2>Logros</h2>
+      <div id="lista-logros" class="logros"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <h2>Últimas líneas</h2>
+    <div class="tabla-marco"><table id="tabla-sesiones"><thead><tr><th>Fecha</th><th>Nivel</th><th>PPM</th><th>Precisión</th><th>Caracteres</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="acciones">
+    <button class="boton boton-suave" id="btn-exportar">Exportar respaldo</button>
+    <label class="boton boton-suave">Importar respaldo <input type="file" id="inp-importar" accept="application/json" hidden></label>
+    <button class="boton boton-suave" id="btn-ajustes">Ajustes del perfil</button>
+    <button class="boton boton-peligro" id="btn-borrar">Borrar este perfil</button>
+  </div>
+  <dialog id="dlg-ajustes" class="tarjeta">
+    <form id="form-ajustes" method="dialog">
+      <h2>Ajustes de <span id="ajustes-nombre"></span></h2>
+      <label>Teclado
+        <select name="distribucion">
+          <option value="latam">Latinoamericano (con ñ)</option>
+          <option value="qwerty">QWERTY (inglés)</option>
+          <option value="colemak">Colemak</option>
+        </select>
+      </label>
+      <label>Palabras por línea
+        <select name="palabras"><option value="6">6</option><option value="8">8</option><option value="12">12</option><option value="20">20</option></select>
+      </label>
+      <label class="fila"><input type="checkbox" name="letraGrande"> Letra grande</label>
+      <label class="fila"><input type="checkbox" name="mostrarTeclado"> Mostrar el teclado en pantalla</label>
+      <div class="acciones"><button class="boton" value="guardar">Guardar</button><button class="boton boton-suave" value="cancelar" formnovalidate>Cancelar</button></div>
+    </form>
+  </dialog>
+</section>
+</main>
+
+<div id="tooltip" class="tooltip" hidden></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

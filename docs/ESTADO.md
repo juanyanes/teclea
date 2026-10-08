@@ -4,19 +4,30 @@ Ultima actualizacion: 2026-10-08.
 
 ## Que hay
 
-Proyecto creado el 2026-10-08. Entrenador de mecanografia en terminal, Python puro:
+Creado el 2026-10-08 como CLI en Python; el mismo dia se reescribio como app web estatica en `sitio/`
+para que la usen Juan (Colemak) y Max (9 anos, empieza; QWERTY/latam) desde cualquier navegador.
 
-- `sesion.py`: registra tecleos contra el texto esperado; PPM bruto/neto, precision, latencia y errores por tecla.
-- `lecciones.py`: 6 niveles (fila base de Colemak -> tres filas -> mayusculas/puntuacion -> frases del corpus).
-  Los niveles bajos prefieren palabras reales del corpus que quepan en el alfabeto del nivel.
-- `registro.py`: SQLite en `~/.local/share/teclea/teclea.db` (`$TECLEA_DB` lo cambia; los tests usan tmp_path).
-- `tui.py`: curses, verde/rojo por caracter, retroceso corrige, Escape abandona.
-- `cli.py`: `teclea [practicar] [-n nivel] [-i es|en] [-p palabras] [-s semilla]`, `teclea stats`, `teclea niveles`.
+- `sitio/js/sesion.js`: tecleos contra el texto; PPM bruto/neto, precision, latencia y errores por tecla.
+  La linea termina solo cuando el ultimo caracter esta bien.
+- `sitio/js/teclados.js`: distribuciones colemak/qwerty/latam, dedo por columna, `teclasPara()` (shift y tecla muerta).
+- `sitio/js/lecciones.js`: 6 niveles derivados de la distribucion; palabras reales del corpus que quepan en el alfabeto;
+  `listoParaSubir()` (3 ultimas del nivel con >= 95 % y >= 20 PPM).
+- `sitio/js/textos.js`: corpus `curioso` (temas de Max, con `{nombre}`), `es`, `en`.
+- `sitio/js/registro.js`: perfiles y sesiones en localStorage (almacen inyectable); exportar/importar JSON.
+- `sitio/js/logros.js`: 14 logros con tema de ajedrez, espacio y comida.
+- Vista: `app.js` (perfiles, practica, progreso), `teclado-vista.js`, `grafica.js` (SVG, una serie, tooltip).
+- Entrada: textarea oculta; caracteres por `input` (sirve con teclas muertas), retroceso/Escape/Enter por `keydown`;
+  pegar se ignora.
+- Publicacion: Cloudflare Pages, proyecto `teclea`, cuenta Citadelta (`make publicar`). Dominio teclea.yanes.me.
+
+Probado en Chrome el 2026-10-08 (perfil, linea con error corregido, resultado, logros, progreso) sin errores en consola.
 
 ## Pendiente / ideas
 
-- Un modo "teclas debiles": generar lineas cargadas con las teclas que mas fallan segun el registro.
-- Niveles para los simbolos de programacion (`{}[]()<>=_-`) y numeros.
-- Grafica de progreso (PPM por fecha) en `stats`.
-- Corpus mas grande; hoy son 30 frases en espanol y 15 en ingles, escritas a mano.
-- Mostrar el teclado Colemak en pantalla con la tecla siguiente resaltada (ayuda al principio).
+- Modo "teclas debiles": lineas cargadas con las teclas que mas fallan del perfil.
+- Nivel de numeros y simbolos de programacion.
+- Mas frases en `curioso` (hoy 38) y revisar con Max cuales le gustan.
+- Las pseudopalabras del nivel 1 en latam meten muchas enies; bajar su frecuencia.
+- Service worker para usar sin red; sincronizacion entre maquinas (hoy, exportar/importar).
+- Sonido o animacion al completar una linea (para Max).
+- Dibujar el Colemak latam (Juan usa `latam+colemak` en GNOME) si el teclado en pantalla no coincide.

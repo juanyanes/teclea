@@ -1,19 +1,17 @@
-.PHONY: check test lint practicar stats instalar
+.PHONY: check test lint servir publicar
 
 check: lint test
 
 lint:
-	uv run ruff check .
+	@for f in sitio/js/*.js tests/*.js; do node --check "$$f" || exit 1; done; echo "sintaxis ok"
 
 test:
-	uv run pytest -q
+	node --test
 
-practicar:
-	uv run teclea
+# Sirve el sitio en http://127.0.0.1:8766 para verlo en el navegador.
+servir:
+	python3 -m http.server 8766 --bind 127.0.0.1 --directory sitio
 
-stats:
-	uv run teclea stats
-
-# Deja el comando `teclea` disponible en ~/.local/bin.
-instalar:
-	uv tool install --force --editable .
+# Publica sitio/ en Cloudflare Pages (proyecto teclea -> https://teclea.yanes.me).
+publicar: check
+	npx --yes wrangler@4 pages deploy sitio --project-name teclea --commit-dirty=true
