@@ -31,7 +31,7 @@ Enter al terminar da otra. Pegar texto no cuenta.
 ```sh
 make check      # sintaxis (node --check) + tests (node --test)
 make servir     # http://127.0.0.1:8766
-make publicar   # make check + wrangler pages deploy sitio
+make publicar   # make check + wrangler deploy (token y cuenta en .env, ver .env.example)
 ```
 
 Requiere Node 22+. La lógica (`sesion.js`, `lecciones.js`, `teclados.js`, `registro.js`, `logros.js`)

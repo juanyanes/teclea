@@ -1,8 +1,8 @@
 {
   // Publicacion en Cloudflare: Worker con estaticos (lo que hoy es Cloudflare Pages). `make publicar`.
+  // La cuenta y el token salen de .env (ver .env.example): la zona yanes.me vive en la cuenta personal de Juan.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "teclea",
-  "account_id": "d20bb391b5b1db26ee264a2c339eb54b",
   "compatibility_date": "2026-10-06",
   "observability": { "enabled": true },
   // URL de respaldo mientras el dominio propio no resuelve: https://teclea.teclea.workers.dev

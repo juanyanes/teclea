@@ -21,17 +21,14 @@ para que la usen Juan (Colemak) y Max (9 anos, empieza; QWERTY/latam) desde cual
 - Publicacion: Worker con estaticos `teclea` en la cuenta Citadelta (`make publicar` = `npx wrangler deploy`,
   config en `wrangler.jsonc`). Viva en https://teclea.teclea.workers.dev desde el 2026-10-08.
 
-## Bloqueado: teclea.yanes.me no resuelve (2026-10-08)
+## Bloqueado: teclea.yanes.me (2026-10-08)
 
-El deploy engancha `teclea.yanes.me (custom domain)` y Cloudflare emite el certificado, pero el registro DNS
-no aparece en ningun nameserver. Causa: la zona `yanes.me` de la cuenta Citadelta (id d95a4941...) esta en
-estado **moved** (modificada el 2026-10-04) con nameservers asignados nadia/wesley, mientras el registro .me
-publica josephine/aarav. La zona que de verdad sirve `yanes.me` no la ve el login de wrangler de mjolnir
-(solo ve Citadelta y la cuenta personal, y ninguna tiene otra zona `yanes.me`). taleny.yanes.me sigue
-resolviendo, pero una zona en "moved" se borra a los dias: revisar en el panel de Cloudflare > yanes.me
-que la zona vuelva a "active" (o crear el registro en la zona viva). Despues, `make publicar` otra vez.
-
-Probado en Chrome el 2026-10-08 (perfil, linea con error corregido, resultado, logros, progreso) sin errores en consola.
+La zona viva de `yanes.me` esta en OTRA cuenta de Cloudflare de Juan (movida el 2026-10-04), que el login de
+wrangler de mjolnir no ve (solo ve Citadelta y la cuenta de yanes.juan@gmail.com). El Worker `teclea` se
+desplego en Citadelta y por eso su dominio propio no obtiene registro DNS: la zona de Citadelta es el cascaron
+en estado "moved". Para resolverlo: token de API de la cuenta buena en `.env` (ver `.env.example`) y
+`make publicar`; despues borrar el Worker de Citadelta (`CLOUDFLARE_ACCOUNT_ID=d20bb391... npx wrangler delete`).
+Mientras, la app vive en https://teclea.teclea.workers.dev.
 
 ## Pendiente / ideas
 
