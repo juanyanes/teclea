@@ -16,6 +16,9 @@ para que la usen Juan (Colemak) y Max (9 anos, empieza; QWERTY/latam) desde cual
 - `sitio/js/registro.js`: perfiles y sesiones en localStorage (almacen inyectable); exportar/importar JSON.
 - `sitio/js/logros.js`: 14 logros con tema de ajedrez, espacio y comida.
 - Vista: `app.js` (perfiles, practica, progreso), `teclado-vista.js`, `grafica.js` (SVG, una serie, tooltip).
+- `sitio/js/i18n.js`: interfaz en espanol e ingles (boton en la cabecera, se guarda en `teclea:idioma`; por defecto el idioma
+  del navegador). Textos estaticos por `data-i18n`, dinamicos por `t()`. Las frases de practica NO se traducen: las elige el
+  selector de frases. Un test exige las mismas claves en los dos diccionarios y que todo `data-i18n` del HTML exista.
 - Entrada: textarea oculta; caracteres por `input` (sirve con teclas muertas), retroceso/Escape/Enter por `keydown`;
   pegar se ignora.
 - Publicacion: Worker con estaticos `teclea` en la cuenta de Cloudflare de juan@yanes.me (la que tiene la zona

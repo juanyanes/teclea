@@ -1,4 +1,6 @@
 // Grafica de linea de una sola serie en SVG, con tooltip al pasar el raton. Sin dependencias.
+import { t } from "./i18n.js";
+
 const NS = "http://www.w3.org/2000/svg";
 
 function el(nombre, atributos = {}, texto) {
@@ -21,7 +23,7 @@ export function dibujarLinea(contenedor, puntos, { formato = (v) => String(Math.
   if (puntos.length < 2) {
     const p = document.createElement("p");
     p.className = "vacio";
-    p.textContent = puntos.length ? "Con una línea más ya hay gráfica." : "Todavía no hay líneas.";
+    p.textContent = puntos.length ? t("grafica.unaMas") : t("grafica.sinLineas");
     contenedor.append(p);
     return;
   }

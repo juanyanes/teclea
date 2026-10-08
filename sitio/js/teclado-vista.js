@@ -1,4 +1,5 @@
 // Dibuja el teclado en pantalla y resalta la tecla siguiente.
+import { t } from "./i18n.js";
 import { DISTRIBUCIONES, dedoDeColumna, teclasPara } from "./teclados.js";
 
 const INDICE_DEDO = { "meñique": 0, anular: 1, medio: 2, "índice": 3 };
@@ -9,7 +10,7 @@ export function dibujarTeclado(contenedor, distribucion) {
   d.filas.forEach((fila, f) => {
     const div = document.createElement("div");
     div.className = "fila-teclas";
-    if (f === 3) div.append(teclaAncha("⇧ Mayús", "shift-izq"));
+    if (f === 3) div.append(teclaAncha(t("teclado.mayus"), "shift-izq"));
     [...fila].forEach((c, col) => {
       const t = document.createElement("div");
       const { dedo } = dedoDeColumna(f, col);
@@ -19,7 +20,7 @@ export function dibujarTeclado(contenedor, distribucion) {
       if (f === 2 && (col === 3 || col === 6)) t.classList.add("guia");
       div.append(t);
     });
-    if (f === 3) div.append(teclaAncha("⇧ Mayús", "shift-der"));
+    if (f === 3) div.append(teclaAncha(t("teclado.mayus"), "shift-der"));
     contenedor.append(div);
   });
   const espacio = document.createElement("div");
@@ -27,12 +28,17 @@ export function dibujarTeclado(contenedor, distribucion) {
   const barra = document.createElement("div");
   barra.className = "tecla espacio";
   barra.dataset.tecla = " ";
-  barra.textContent = "espacio";
+  barra.textContent = t("teclado.espacio");
   espacio.append(barra);
   contenedor.append(espacio);
   const leyenda = document.createElement("div");
   leyenda.className = "leyenda-dedos";
-  leyenda.innerHTML = '<span class="d0">meñique</span><span class="d1">anular</span><span class="d2">medio</span><span class="d3">índice</span>';
+  leyenda.replaceChildren(...["meñique", "anular", "medio", "índice"].map((d, i) => {
+    const sp = document.createElement("span");
+    sp.className = `d${i}`;
+    sp.textContent = t(`teclado.${d}`);
+    return sp;
+  }));
   contenedor.append(leyenda);
 }
 

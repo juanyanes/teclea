@@ -8,12 +8,12 @@ export function niveles(distribucion) {
   const base = filas.base;
   const tres = base + filas.superior + filas.inferior;
   return [
-    { numero: 1, nombre: "Fila base, sin estirar los índices", alfabeto: centroFilaBase(distribucion) },
-    { numero: 2, nombre: "Fila base completa", alfabeto: base },
-    { numero: 3, nombre: "Fila base y superior", alfabeto: base + filas.superior },
-    { numero: 4, nombre: "Las tres filas de letras", alfabeto: tres },
-    { numero: 5, nombre: "Mayúsculas y puntuación", alfabeto: tres, mayusculas: true, puntuacion: true },
-    { numero: 6, nombre: "Frases completas", alfabeto: "", frases: true },
+    { numero: 1, clave: "nivel.1", alfabeto: centroFilaBase(distribucion) },
+    { numero: 2, clave: "nivel.2", alfabeto: base },
+    { numero: 3, clave: "nivel.3", alfabeto: base + filas.superior },
+    { numero: 4, clave: "nivel.4", alfabeto: tres },
+    { numero: 5, clave: "nivel.5", alfabeto: tres, mayusculas: true, puntuacion: true },
+    { numero: 6, clave: "nivel.6", alfabeto: "", frases: true },
   ];
 }
 

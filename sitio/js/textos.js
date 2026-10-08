@@ -1,8 +1,7 @@
-// Corpus de frases. {nombre} se sustituye por el nombre del perfil.
+// Corpus de frases. {nombre} se sustituye por el nombre del perfil. El titulo de cada corpus esta en i18n (corpus.<clave>).
 
 export const CORPUS = {
   curioso: {
-    nombre: "Ajedrez, Pokémon, espacio y mates",
     frases: [
       "El caballo es la única pieza de ajedrez que puede saltar sobre otras.",
       "Un tablero de ajedrez tiene 64 casillas: 32 claras y 32 oscuras.",
@@ -45,7 +44,6 @@ export const CORPUS = {
     ],
   },
   es: {
-    nombre: "Frases en español",
     frases: [
       "El dron despegó al amanecer y recorrió los predios de agave antes del calor.",
       "La niña dibujó un pingüino azul en la última página del cuaderno.",
@@ -79,7 +77,6 @@ export const CORPUS = {
     ],
   },
   en: {
-    nombre: "English sentences",
     frases: [
       "The quick brown fox jumps over the lazy dog near the riverbank.",
       "Measure twice, cut once, and keep the receipt just in case.",

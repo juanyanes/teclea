@@ -1,6 +1,7 @@
 // Pega las piezas: perfiles, practica, resultados y progreso. Todo el estado vive en el Registro.
 import { crearAzar } from "./azar.js";
 import { dibujarLinea } from "./grafica.js";
+import { LOCALES, aplicarTraducciones, fijarIdioma, idioma, idiomaInicial, t } from "./i18n.js";
 import { generarLinea, listoParaSubir, nivel, niveles } from "./lecciones.js";
 import { LOGROS, logrosCumplidos, logrosNuevos } from "./logros.js";
 import { Registro, almacenEnMemoria } from "./registro.js";
@@ -49,7 +50,9 @@ document.body.addEventListener("click", (e) => {
 
 // ---------- perfiles ----------
 function llenarCorpus(select) {
-  select.replaceChildren(...Object.entries(CORPUS).map(([k, c]) => new Option(c.nombre, k)));
+  const valor = select.value;
+  select.replaceChildren(...Object.keys(CORPUS).map((k) => new Option(t(`corpus.${k}`), k)));
+  if (valor) select.value = valor;
 }
 
 function pintarPerfiles() {
@@ -59,11 +62,13 @@ function pintarPerfiles() {
   for (const p of perfiles) {
     const b = document.createElement("button");
     b.className = "tarjeta perfil";
-    const t = registro.totales(p.id);
+    const tot = registro.totales(p.id);
     b.innerHTML = `<span class="nombre"></span><span class="detalle"></span><span class="detalle"></span>`;
     b.children[0].textContent = p.nombre;
-    b.children[1].textContent = `${DISTRIBUCIONES[p.distribucion].nombre} · nivel ${p.nivel}`;
-    b.children[2].textContent = t.sesiones ? `${t.sesiones} líneas · ${Math.round(t.ppmReciente)} PPM` : "Sin líneas todavía";
+    b.children[1].textContent = `${t(`dist.${p.distribucion}`)} · ${t("perfiles.nivel")} ${p.nivel}`;
+    b.children[2].textContent = tot.sesiones
+      ? `${tot.sesiones} ${t("perfiles.lineas")} · ${Math.round(tot.ppmReciente)} ${t("practica.ppm")}`
+      : t("perfiles.sinLineas");
     b.addEventListener("click", () => elegirPerfil(p.id));
     lista.append(b);
   }
@@ -98,8 +103,9 @@ $("form-perfil").addEventListener("submit", (e) => {
 // ---------- práctica ----------
 function pintarControles() {
   const sel = $("sel-nivel");
-  sel.replaceChildren(...niveles(perfil.distribucion).map((n) => new Option(`${n.numero} · ${n.nombre}`, n.numero)));
+  sel.replaceChildren(...niveles(perfil.distribucion).map((n) => new Option(`${n.numero} · ${t(n.clave)}`, n.numero)));
   sel.value = String(nivelActual);
+  llenarCorpus($("sel-corpus"));
   $("sel-corpus").value = corpusActual;
   const teclado = $("teclado");
   teclado.hidden = perfil.mostrarTeclado === false;
@@ -109,7 +115,7 @@ function pintarControles() {
 function nuevaLinea() {
   pintarControles();
   const niv = nivel(perfil.distribucion, nivelActual);
-  const texto = generarLinea(niv, az, { palabras: perfil.palabras, corpus: CORPUS[corpusActual].frases, nombre: perfil.nombre });
+  const texto = generarLinea(niv, az, { palabras: perfil.palabras, corpus: CORPUS[corpusActual].frases, nombre: perfil.nombre || t("practica.alguien") });
   sesion = new Sesion(texto);
   $("resultado").hidden = true;
   $("texto-marco").classList.remove("terminada");
@@ -206,21 +212,23 @@ function terminar() {
   registro.guardarSesion(perfil.id, r, { nivel: nivelActual, corpus: corpusActual });
   const despues = registro.sesiones(perfil.id);
 
-  $("res-titulo").textContent = r.precision >= 1 ? "¡Perfecto, ni un error!" : r.precision >= 0.95 ? "¡Muy bien!" : "¡Línea completa!";
+  $("res-titulo").textContent = t(r.precision >= 1 ? "practica.perfecto" : r.precision >= 0.95 ? "practica.muyBien" : "practica.lineaCompleta");
   $("res-ppm").textContent = Math.round(r.ppmNeto);
   $("res-precision").textContent = `${Math.round(100 * r.precision)}%`;
   $("res-tiempo").textContent = r.segundos.toFixed(1);
   $("res-errores").textContent = r.errores;
   const debiles = teclasDebiles(r.teclas, 4).filter((t) => t.errores > 0);
   $("res-debiles").textContent = debiles.length
-    ? `Se te resistieron: ${debiles.map((t) => `"${t.tecla === " " ? "espacio" : t.tecla}" (${t.errores} de ${t.intentos})`).join(", ")}`
+    ? t("practica.resistieron", {
+      lista: debiles.map((d) => `"${d.tecla === " " ? t("practica.espacio") : d.tecla}" (${t("practica.deIntentos", { errores: d.errores, intentos: d.intentos })})`).join(", "),
+    })
     : "";
   const nuevos = logrosNuevos(antes, despues);
   $("res-logros").replaceChildren(...nuevos.map((l) => {
     const s = document.createElement("span");
     s.className = "logro-nuevo";
-    s.textContent = `${l.emoji} Logro: ${l.nombre}`;
-    s.title = l.descripcion;
+    s.textContent = `${l.emoji} ${t("practica.logro", { nombre: t(`logro.${l.id}.nombre`) })}`;
+    s.title = t(`logro.${l.id}.desc`);
     return s;
   }));
   const subir = listoParaSubir(despues, nivelActual);
@@ -231,17 +239,17 @@ function terminar() {
 }
 
 // ---------- progreso ----------
-const fechaCorta = (iso) => new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "short" });
-const fechaLarga = (iso) => new Date(iso).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const fechaCorta = (iso) => new Date(iso).toLocaleDateString(LOCALES[idioma()], { day: "numeric", month: "short" });
+const fechaLarga = (iso) => new Date(iso).toLocaleString(LOCALES[idioma()], { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
 function pintarStats() {
   const sesiones = registro.sesiones(perfil.id);
-  const t = registro.totales(perfil.id);
-  $("stats-titulo").textContent = `Progreso de ${perfil.nombre}`;
-  $("tot-sesiones").textContent = t.sesiones;
-  $("tot-palabras").textContent = t.palabras.toLocaleString("es-MX");
-  $("tot-mejor").textContent = Math.round(t.mejorPpm);
-  $("tot-reciente").textContent = Math.round(t.ppmReciente);
+  const tot = registro.totales(perfil.id);
+  $("stats-titulo").textContent = t("stats.progresoDe", { nombre: perfil.nombre });
+  $("tot-sesiones").textContent = tot.sesiones;
+  $("tot-palabras").textContent = tot.palabras.toLocaleString(LOCALES[idioma()]);
+  $("tot-mejor").textContent = Math.round(tot.mejorPpm);
+  $("tot-reciente").textContent = Math.round(tot.ppmReciente);
   const ultimas = sesiones.slice(-100);
   dibujarLinea($("graf-ppm"), ultimas.map((s) => ({ valor: s.ppmNeto, etiqueta: fechaCorta(s.fecha), detalle: fechaLarga(s.fecha) })));
   dibujarLinea($("graf-precision"), ultimas.map((s) => ({ valor: 100 * s.precision, etiqueta: fechaCorta(s.fecha), detalle: fechaLarga(s.fecha) })),
@@ -253,10 +261,15 @@ function pintarStats() {
     li.innerHTML = `<kbd></kbd><div class="barra"><i></i></div><small></small>`;
     li.querySelector("kbd").textContent = d.tecla === " " ? "␣" : d.tecla;
     li.querySelector("i").style.width = `${Math.min(100, 100 * d.tasaError / 0.5)}%`;
-    li.querySelector("small").textContent = `${Math.round(100 * d.tasaError)} % de ${d.intentos}${d.latenciaMs ? ` · ${Math.round(d.latenciaMs)} ms` : ""}`;
+    li.querySelector("small").textContent = `${t("stats.porcentajeDe", { pct: Math.round(100 * d.tasaError), intentos: d.intentos })}${d.latenciaMs ? ` · ${Math.round(d.latenciaMs)} ms` : ""}`;
     return li;
   }));
-  if (!debiles.length) $("lista-debiles").innerHTML = '<li class="nota">Todavía no hay teclas con errores repetidos.</li>';
+  if (!debiles.length) {
+    const li = document.createElement("li");
+    li.className = "nota";
+    li.textContent = t("stats.sinTeclas");
+    $("lista-debiles").replaceChildren(li);
+  }
 
   const cumplidos = new Set(logrosCumplidos(sesiones));
   $("lista-logros").replaceChildren(...LOGROS.map((l) => {
@@ -264,8 +277,8 @@ function pintarStats() {
     d.className = `logro${cumplidos.has(l.id) ? "" : " bloqueado"}`;
     d.innerHTML = `<span class="emoji"></span><b></b><span></span>`;
     d.children[0].textContent = l.emoji;
-    d.children[1].textContent = l.nombre;
-    d.children[2].textContent = l.descripcion;
+    d.children[1].textContent = t(`logro.${l.id}.nombre`);
+    d.children[2].textContent = t(`logro.${l.id}.desc`);
     return d;
   }));
 
@@ -276,7 +289,7 @@ function pintarStats() {
     tr.children[0].textContent = fechaLarga(s.fecha);
     tr.children[1].textContent = s.nivel;
     tr.children[2].textContent = Math.round(s.ppmNeto);
-    tr.children[3].textContent = `${Math.round(100 * s.precision)} %`;
+    tr.children[3].textContent = t("stats.pct", { pct: Math.round(100 * s.precision) });
     tr.children[4].textContent = s.caracteres;
     return tr;
   }));
@@ -298,12 +311,12 @@ $("inp-importar").addEventListener("change", async (e) => {
     perfil = registro.perfil(perfil.id) ?? perfil;
     pintarStats();
   } catch (err) {
-    alert(`No se pudo importar: ${err.message}`);
+    alert(t("stats.errorImportar", { error: err.message }));
   }
   e.target.value = "";
 });
 $("btn-borrar").addEventListener("click", () => {
-  if (!confirm(`¿Borrar el perfil de ${perfil.nombre} con todas sus líneas? No se puede deshacer.`)) return;
+  if (!confirm(t("stats.confirmarBorrar", { nombre: perfil.nombre }))) return;
   registro.borrarPerfil(perfil.id);
   perfil = null;
   ir("perfiles");
@@ -330,7 +343,31 @@ $("dlg-ajustes").addEventListener("close", () => {
   $("chip-perfil").textContent = perfil.nombre;
 });
 
+// ---------- idioma ----------
+function leerGuardado(clave) {
+  try { return localStorage.getItem(clave); } catch { return null; }
+}
+
+function aplicarIdioma(nuevo) {
+  fijarIdioma(nuevo);
+  try { localStorage.setItem("teclea:idioma", nuevo); } catch { /* sin almacenamiento */ }
+  aplicarTraducciones(document);
+  llenarCorpus($("form-corpus"));
+  if (!perfil) return;
+  if (!$("vista-practica").hidden) {
+    pintarControles();
+    if (sesion) pintarTexto();
+    if (sesion && !sesion.terminada) $("entrada").focus({ preventScroll: true });
+  }
+  if (!$("vista-stats").hidden) pintarStats();
+  if (!$("vista-perfiles").hidden) pintarPerfiles();
+}
+
+$("btn-idioma").addEventListener("click", () => aplicarIdioma(idioma() === "es" ? "en" : "es"));
+
 // ---------- arranque ----------
+fijarIdioma(idiomaInicial(leerGuardado("teclea:idioma"), navigator.language));
+aplicarTraducciones(document);
 llenarCorpus($("form-corpus"));
 llenarCorpus($("sel-corpus"));
 let ultimo = null;
