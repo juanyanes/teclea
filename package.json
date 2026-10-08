@@ -6,6 +6,11 @@
   "description": "Entrenador de mecanografia en el navegador, para toda la familia.",
   "scripts": {
     "test": "node --test",
-    "lint": "for f in sitio/js/*.js tests/*.js; do node --check \"$f\" || exit 1; done"
+    "lint": "for f in sitio/js/*.js tests/*.js; do node --check \"$f\" || exit 1; done",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.148.0"
   }
 }

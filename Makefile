@@ -12,6 +12,6 @@ test:
 servir:
 	python3 -m http.server 8766 --bind 127.0.0.1 --directory sitio
 
-# Publica sitio/ en Cloudflare Pages (proyecto teclea -> https://teclea.yanes.me).
+# Publica sitio/ en Cloudflare (Worker con estaticos) -> https://teclea.yanes.me
 publicar: check
-	npx --yes wrangler@4 pages deploy sitio --project-name teclea --commit-dirty=true
+	npx wrangler deploy

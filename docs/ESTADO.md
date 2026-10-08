@@ -18,7 +18,18 @@ para que la usen Juan (Colemak) y Max (9 anos, empieza; QWERTY/latam) desde cual
 - Vista: `app.js` (perfiles, practica, progreso), `teclado-vista.js`, `grafica.js` (SVG, una serie, tooltip).
 - Entrada: textarea oculta; caracteres por `input` (sirve con teclas muertas), retroceso/Escape/Enter por `keydown`;
   pegar se ignora.
-- Publicacion: Cloudflare Pages, proyecto `teclea`, cuenta Citadelta (`make publicar`). Dominio teclea.yanes.me.
+- Publicacion: Worker con estaticos `teclea` en la cuenta Citadelta (`make publicar` = `npx wrangler deploy`,
+  config en `wrangler.jsonc`). Viva en https://teclea.teclea.workers.dev desde el 2026-10-08.
+
+## Bloqueado: teclea.yanes.me no resuelve (2026-10-08)
+
+El deploy engancha `teclea.yanes.me (custom domain)` y Cloudflare emite el certificado, pero el registro DNS
+no aparece en ningun nameserver. Causa: la zona `yanes.me` de la cuenta Citadelta (id d95a4941...) esta en
+estado **moved** (modificada el 2026-10-04) con nameservers asignados nadia/wesley, mientras el registro .me
+publica josephine/aarav. La zona que de verdad sirve `yanes.me` no la ve el login de wrangler de mjolnir
+(solo ve Citadelta y la cuenta personal, y ninguna tiene otra zona `yanes.me`). taleny.yanes.me sigue
+resolviendo, pero una zona en "moved" se borra a los dias: revisar en el panel de Cloudflare > yanes.me
+que la zona vuelva a "active" (o crear el registro en la zona viva). Despues, `make publicar` otra vez.
 
 Probado en Chrome el 2026-10-08 (perfil, linea con error corregido, resultado, logros, progreso) sin errores en consola.
 

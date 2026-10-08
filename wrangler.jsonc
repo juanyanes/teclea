@@ -1,0 +1,13 @@
+{
+  // Publicacion en Cloudflare: Worker con estaticos (lo que hoy es Cloudflare Pages). `make publicar`.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "teclea",
+  "account_id": "d20bb391b5b1db26ee264a2c339eb54b",
+  "compatibility_date": "2026-10-06",
+  "observability": { "enabled": true },
+  // URL de respaldo mientras el dominio propio no resuelve: https://teclea.teclea.workers.dev
+  "workers_dev": true,
+  "assets": { "directory": "sitio", "not_found_handling": "404-page" },
+  // teclea.yanes.me: wrangler crea el registro DNS y el certificado al desplegar.
+  "routes": [{ "pattern": "teclea.yanes.me", "custom_domain": true }]
+}
